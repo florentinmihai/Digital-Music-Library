@@ -18,4 +18,30 @@ async function retrieveMusicLibrary() {
     await client.close();
   }
 }
-module.exports = { retrieveMusicLibrary };
+
+async function deleteArtist(artistName) {
+  try {
+    await client
+      .db("MusicLibrary")
+      .collection("MusicLibrary")
+      .deleteOne({ name: artistName });
+  } catch (err) {
+    console.error("Error deleting artist:", err);
+  }
+}
+
+async function deleteAlbum(artistName, albumTitle) {
+  try {
+    await client
+      .db("MusicLibrary")
+      .collection("MusicLibrary")
+      .updateOne(
+        { name: artistName },
+        { $pull: { albums: { title: albumTitle } } }
+      );
+  } catch (err) {
+    console.error("Error deleting album:", err);
+  }
+}
+
+module.exports = { retrieveMusicLibrary, deleteArtist, deleteAlbum };
