@@ -7,9 +7,20 @@ export default function App() {
   const [selectedAlbum, setSelectedAlbum] = useState(null);
 
   useEffect(() => {
-    Axios.get("http://localhost:4000/api/retrieveMusicLibrary").then((res) =>
-      setList(res.data)
-    );
+    Axios.get("http://localhost:4000/api/retrieveMusicLibrary")
+      .then((res) => {
+        const data = res.data;
+        if (Array.isArray(data)) {
+          setList(data);
+        } else {
+          console.error("Unexpected data structure:", data);
+          setList([]);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        setList([]);
+      });
   }, []);
 
   function handleSelectArtist(artist) {
@@ -30,61 +41,72 @@ export default function App() {
   }
 
   async function handleDeleteArtist(artistName) {
-    await Axios.delete(`http://localhost:4000/api/deleteArtist/${artistName}`);
-    setList((list) => list.filter((artist) => artist.name !== artistName));
-    setSelectedArtist(null);
-    setSelectedAlbum(null);
+    try {
+      await Axios.delete(
+        `http://localhost:4000/api/deleteArtist/${artistName}`
+      );
+      setList((list) => list.filter((artist) => artist.name !== artistName));
+      setSelectedArtist(null);
+      setSelectedAlbum(null);
+    } catch (error) {
+      console.error("Error deleting artist:", error);
+    }
   }
 
   async function handleDeleteAlbum(artistName, albumTitle) {
-    await Axios.delete(
-      `http://localhost:4000/api/deleteAlbum/${artistName}/${albumTitle}`
-    );
-
-    setList((list) =>
-      list.map((artist) =>
-        artist.name === artistName
-          ? {
-              ...artist,
-              albums: artist.albums.filter(
-                (album) => album.title !== albumTitle
-              ),
-            }
-          : artist
-      )
-    );
-
-    setSelectedAlbum(null);
-    setSelectedArtist((prevSelectedArtist) => ({
-      ...prevSelectedArtist,
-      albums: prevSelectedArtist.albums.filter(
-        (album) => album.title !== albumTitle
-      ),
-    }));
+    try {
+      await Axios.delete(
+        `http://localhost:4000/api/deleteAlbum/${artistName}/${albumTitle}`
+      );
+      setList((list) =>
+        list.map((artist) =>
+          artist.name === artistName
+            ? {
+                ...artist,
+                albums: artist.albums.filter(
+                  (album) => album.title !== albumTitle
+                ),
+              }
+            : artist
+        )
+      );
+      setSelectedAlbum(null);
+      setSelectedArtist((prevSelectedArtist) => ({
+        ...prevSelectedArtist,
+        albums: prevSelectedArtist.albums.filter(
+          (album) => album.title !== albumTitle
+        ),
+      }));
+    } catch (error) {
+      console.error("Error deleting album:", error);
+    }
   }
 
   async function handleUpdateArtist(oldName, newName) {
-    await Axios.put(`http://localhost:4000/api/updateArtist/`, {
-      oldName,
-      newName,
-    });
+    try {
+      await Axios.put(`http://localhost:4000/api/updateArtist/`, {
+        oldName,
+        newName,
+      });
+      setList((list) =>
+        list.map((artist) =>
+          artist.name === oldName
+            ? {
+                ...artist,
+                name: newName,
+              }
+            : artist
+        )
+      );
 
-    setList((list) =>
-      list.map((artist) =>
-        artist.name === oldName
-          ? {
-              ...artist,
-              name: newName,
-            }
-          : artist
-      )
-    );
-
-    if (selectedArtist && selectedArtist.name === oldName) {
-      setSelectedArtist((prevSelectedArtist) => ({
-        ...prevSelectedArtist,
-        name: newName,
-      }));
+      if (selectedArtist && selectedArtist.name === oldName) {
+        setSelectedArtist((prevSelectedArtist) => ({
+          ...prevSelectedArtist,
+          name: newName,
+        }));
+      }
+    } catch (error) {
+      console.error("Error updating artist:", error);
     }
   }
 
@@ -94,44 +116,47 @@ export default function App() {
     newTitle,
     newDescription
   ) {
-    await Axios.put(`http://localhost:4000/api/updateAlbum/`, {
-      artistName,
-      oldTitle,
-      newTitle,
-      newDescription,
-    });
+    try {
+      await Axios.put(`http://localhost:4000/api/updateAlbum/`, {
+        artistName,
+        oldTitle,
+        newTitle,
+        newDescription,
+      });
+      setList((list) =>
+        list.map((artist) =>
+          artist.name === artistName
+            ? {
+                ...artist,
+                albums: artist.albums.map((album) =>
+                  album.title === oldTitle
+                    ? { ...album, title: newTitle, description: newDescription }
+                    : album
+                ),
+              }
+            : artist
+        )
+      );
 
-    setList((list) =>
-      list.map((artist) =>
-        artist.name === artistName
-          ? {
-              ...artist,
-              albums: artist.albums.map((album) =>
-                album.title === oldTitle
-                  ? { ...album, title: newTitle, description: newDescription }
-                  : album
-              ),
-            }
-          : artist
-      )
-    );
+      if (selectedAlbum && selectedAlbum.title === oldTitle) {
+        setSelectedAlbum((prevSelectedAlbum) => ({
+          ...prevSelectedAlbum,
+          title: newTitle,
+          description: newDescription,
+        }));
+      }
 
-    if (selectedAlbum && selectedAlbum.title === oldTitle) {
-      setSelectedAlbum((prevSelectedAlbum) => ({
-        ...prevSelectedAlbum,
-        title: newTitle,
-        description: newDescription,
+      setSelectedArtist((prevSelectedArtist) => ({
+        ...prevSelectedArtist,
+        albums: prevSelectedArtist.albums.map((album) =>
+          album.title === oldTitle
+            ? { ...album, title: newTitle, description: newDescription }
+            : album
+        ),
       }));
+    } catch (error) {
+      console.error("Error updating album:", error);
     }
-
-    setSelectedArtist((prevSelectedArtist) => ({
-      ...prevSelectedArtist,
-      albums: prevSelectedArtist.albums.map((album) =>
-        album.title === oldTitle
-          ? { ...album, title: newTitle, description: newDescription }
-          : album
-      ),
-    }));
   }
 
   return (
@@ -240,9 +265,11 @@ function ArtistList({
   onUpdateArtist,
   selectedArtist,
 }) {
-  return (
+  return list.length === 0 ? (
+    <div className="center-text-container">No data available. 🥺</div>
+  ) : (
     <ul className="list list-library">
-      {list?.map((artist) => (
+      {list.map((artist) => (
         <Artist
           artist={artist}
           key={artist.name}
@@ -312,7 +339,7 @@ function AlbumList({
   onUpdateAlbum,
   selectedAlbum,
 }) {
-  return (
+  return artist.albums && artist.albums.length > 0 ? (
     <ul className="list list-library">
       {artist.albums.map((album) => (
         <Album
@@ -326,6 +353,8 @@ function AlbumList({
         />
       ))}
     </ul>
+  ) : (
+    <div className="center-text-container">No data available. 🥺</div>
   );
 }
 
@@ -391,29 +420,41 @@ function AlbumDetails({ album, onCloseAlbum }) {
   return (
     <div className="details">
       <h1 className={"box-title"}>{album.title}</h1>
-
-      <p className={"box-text"}>{album.description}</p>
-
-      <SongList songs={album.songs} />
+      {album.description ? (
+        <p className={"box-text"}>{album.description}</p>
+      ) : (
+        <p className="center-text-container">No data available. 🥺</p>
+      )}
+      {album.songs && album.songs.length > 0 ? (
+        <SongList songs={album.songs} />
+      ) : album.description ? (
+        <p className="center-text-container">No data available. 🥺</p>
+      ) : (
+        ""
+      )}
     </div>
   );
 }
 
 function SongList({ songs }) {
-  return (
+  return songs && songs.length > 0 ? (
     <ul className="list list-library">
       {songs.map((song) => (
         <Song song={song} key={song.title} />
       ))}
     </ul>
+  ) : (
+    <div className="center-text-container">No data available. 🥺</div>
   );
 }
 
 function Song({ song }) {
-  return (
+  return song && song.title && song.length ? (
     <li className="list list-library">
       <span>{song.title}</span>
       <span>{song.length} 🕧 </span>
     </li>
+  ) : (
+    <div className="center-text-container">Invalid song data. 🥺</div>
   );
 }
