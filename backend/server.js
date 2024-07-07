@@ -5,7 +5,7 @@ http
   .createServer(async (req, res) => {
     // Handle CORS errors
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET, DELETE");
+    res.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET, DELETE, PUT");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     res.setHeader("Access-Control-Max-Age", 2592000); // 30 days
 
@@ -60,6 +60,54 @@ http
       } finally {
         res.end();
       }
+    } else if (
+      req.method === "PUT" &&
+      req.url.startsWith("/api/updateArtist/")
+    ) {
+      let body = "";
+      req.on("data", (chunk) => {
+        body += chunk.toString();
+      });
+      req.on("end", async () => {
+        const { oldName, newName } = JSON.parse(body);
+        try {
+          await database.updateArtist(oldName, newName);
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.write(JSON.stringify({ message: "Artist updated successfully" }));
+        } catch (err) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.write(JSON.stringify({ error: "Failed to update artist" }));
+        } finally {
+          res.end();
+        }
+      });
+    } else if (
+      req.method === "PUT" &&
+      req.url.startsWith("/api/updateAlbum/")
+    ) {
+      let body = "";
+      req.on("data", (chunk) => {
+        body += chunk.toString();
+      });
+      req.on("end", async () => {
+        const { artistName, oldTitle, newTitle, newDescription } =
+          JSON.parse(body);
+        try {
+          await database.updateAlbum(
+            artistName,
+            oldTitle,
+            newTitle,
+            newDescription
+          );
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.write(JSON.stringify({ message: "Album updated successfully" }));
+        } catch (err) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.write(JSON.stringify({ error: "Failed to update album" }));
+        } finally {
+          res.end();
+        }
+      });
     }
   })
   .listen(4000);

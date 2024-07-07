@@ -55,6 +55,83 @@ export default function App() {
     );
 
     setSelectedAlbum(null);
+    setSelectedArtist((prevSelectedArtist) => ({
+      ...prevSelectedArtist,
+      albums: prevSelectedArtist.albums.filter(
+        (album) => album.title !== albumTitle
+      ),
+    }));
+  }
+
+  async function handleUpdateArtist(oldName, newName) {
+    await Axios.put(`http://localhost:4000/api/updateArtist/`, {
+      oldName,
+      newName,
+    });
+
+    setList((list) =>
+      list.map((artist) =>
+        artist.name === oldName
+          ? {
+              ...artist,
+              name: newName,
+            }
+          : artist
+      )
+    );
+
+    if (selectedArtist && selectedArtist.name === oldName) {
+      setSelectedArtist((prevSelectedArtist) => ({
+        ...prevSelectedArtist,
+        name: newName,
+      }));
+    }
+  }
+
+  async function handleUpdateAlbum(
+    artistName,
+    oldTitle,
+    newTitle,
+    newDescription
+  ) {
+    await Axios.put(`http://localhost:4000/api/updateAlbum/`, {
+      artistName,
+      oldTitle,
+      newTitle,
+      newDescription,
+    });
+
+    setList((list) =>
+      list.map((artist) =>
+        artist.name === artistName
+          ? {
+              ...artist,
+              albums: artist.albums.map((album) =>
+                album.title === oldTitle
+                  ? { ...album, title: newTitle, description: newDescription }
+                  : album
+              ),
+            }
+          : artist
+      )
+    );
+
+    if (selectedAlbum && selectedAlbum.title === oldTitle) {
+      setSelectedAlbum((prevSelectedAlbum) => ({
+        ...prevSelectedAlbum,
+        title: newTitle,
+        description: newDescription,
+      }));
+    }
+
+    setSelectedArtist((prevSelectedArtist) => ({
+      ...prevSelectedArtist,
+      albums: prevSelectedArtist.albums.map((album) =>
+        album.title === oldTitle
+          ? { ...album, title: newTitle, description: newDescription }
+          : album
+      ),
+    }));
   }
 
   return (
@@ -69,6 +146,7 @@ export default function App() {
             list={list}
             onSelectArtist={handleSelectArtist}
             onDeleteArtist={handleDeleteArtist}
+            onUpdateArtist={handleUpdateArtist}
             selectedArtist={selectedArtist}
           />
         </Box>
@@ -79,6 +157,7 @@ export default function App() {
               artist={selectedArtist}
               onSelectAlbum={handleSelectAlbum}
               onDeleteAlbum={handleDeleteAlbum}
+              onUpdateAlbum={handleUpdateAlbum}
               selectedAlbum={selectedAlbum}
             />
           ) : (
@@ -146,15 +225,21 @@ function Box({ title, children }) {
   return (
     <div className="box">
       <button className="btn-toggle" onClick={() => setIsOpen((open) => !open)}>
-        {isOpen ? "+" : "-"}
+        {isOpen ? "-" : "+"}
       </button>
-      <h1 className={"box-title"}> {title}</h1>
+      <h1 className={"box-title"}>{title}</h1>
       {isOpen && children}
     </div>
   );
 }
 
-function ArtistList({ list, onSelectArtist, onDeleteArtist, selectedArtist }) {
+function ArtistList({
+  list,
+  onSelectArtist,
+  onDeleteArtist,
+  onUpdateArtist,
+  selectedArtist,
+}) {
   return (
     <ul className="list list-library">
       {list?.map((artist) => (
@@ -163,6 +248,7 @@ function ArtistList({ list, onSelectArtist, onDeleteArtist, selectedArtist }) {
           key={artist.name}
           onSelectArtist={onSelectArtist}
           onDeleteArtist={onDeleteArtist}
+          onUpdateArtist={onUpdateArtist}
           isSelected={selectedArtist && selectedArtist.name === artist.name}
         />
       ))}
@@ -170,22 +256,62 @@ function ArtistList({ list, onSelectArtist, onDeleteArtist, selectedArtist }) {
   );
 }
 
-function Artist({ artist, onSelectArtist, onDeleteArtist, isSelected }) {
+function Artist({
+  artist,
+  onSelectArtist,
+  onDeleteArtist,
+  onUpdateArtist,
+  isSelected,
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [newName, setNewName] = useState(artist.name);
+
+  const handleUpdate = () => {
+    onUpdateArtist(artist.name, newName);
+    setIsEditing(false);
+  };
+
   return (
     <li className={isSelected ? "selected" : ""}>
-      <h3 onClick={() => onSelectArtist(artist)}>{artist.name}</h3>
-      <button
-        className={"btn-delete"}
-        onClick={() => onDeleteArtist(artist.name)}
-      >
-        ❌
-      </button>
-      <button className={"btn-update"}>✏️</button>
+      {isEditing ? (
+        <>
+          <input
+            className={"edit-text"}
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+          />
+          <button className={"btn-save"} onClick={handleUpdate}>
+            👍🏼
+          </button>
+          <button className={"btn-delete"} onClick={() => setIsEditing(false)}>
+            👎🏼
+          </button>
+        </>
+      ) : (
+        <>
+          <h3 onClick={() => onSelectArtist(artist)}>{artist.name}</h3>
+          <button
+            className={"btn-delete"}
+            onClick={() => onDeleteArtist(artist.name)}
+          >
+            🗑️
+          </button>
+          <button className={"btn-update"} onClick={() => setIsEditing(true)}>
+            ✏️
+          </button>
+        </>
+      )}
     </li>
   );
 }
 
-function AlbumList({ artist, onSelectAlbum, onDeleteAlbum, selectedAlbum }) {
+function AlbumList({
+  artist,
+  onSelectAlbum,
+  onDeleteAlbum,
+  onUpdateAlbum,
+  selectedAlbum,
+}) {
   return (
     <ul className="list list-library">
       {artist.albums.map((album) => (
@@ -194,6 +320,7 @@ function AlbumList({ artist, onSelectAlbum, onDeleteAlbum, selectedAlbum }) {
           key={album.title}
           onSelectAlbum={onSelectAlbum}
           onDeleteAlbum={onDeleteAlbum}
+          onUpdateAlbum={onUpdateAlbum}
           artistName={artist.name}
           isSelected={selectedAlbum && selectedAlbum.title === album.title}
         />
@@ -206,19 +333,56 @@ function Album({
   album,
   onSelectAlbum,
   onDeleteAlbum,
+  onUpdateAlbum,
   artistName,
   isSelected,
 }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [newTitle, setNewTitle] = useState(album.title);
+  const [newDescription, setNewDescription] = useState(album.description);
+
+  const handleUpdate = () => {
+    onUpdateAlbum(artistName, album.title, newTitle, newDescription);
+    setIsEditing(false);
+  };
+
   return (
     <li className={isSelected ? "selected" : ""}>
-      <h4 onClick={() => onSelectAlbum(album)}>{album.title}</h4>
-      <button
-        className={"btn-delete"}
-        onClick={() => onDeleteAlbum(artistName, album.title)}
-      >
-        ❌
-      </button>
-      <button className={"btn-update"}>✏️</button>
+      {isEditing ? (
+        <>
+          <input
+            className={"edit-text"}
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+          />
+          <br />
+          <br />
+          <textarea
+            className={"edit-text-description"}
+            value={newDescription}
+            onChange={(e) => setNewDescription(e.target.value)}
+          />
+          <button className={"btn-save"} onClick={handleUpdate}>
+            👍🏼
+          </button>
+          <button className={"btn-delete"} onClick={() => setIsEditing(false)}>
+            👎🏼
+          </button>
+        </>
+      ) : (
+        <>
+          <h4 onClick={() => onSelectAlbum(album)}>{album.title}</h4>
+          <button
+            className={"btn-delete"}
+            onClick={() => onDeleteAlbum(artistName, album.title)}
+          >
+            🗑️
+          </button>
+          <button className={"btn-update"} onClick={() => setIsEditing(true)}>
+            ✏️
+          </button>
+        </>
+      )}
     </li>
   );
 }

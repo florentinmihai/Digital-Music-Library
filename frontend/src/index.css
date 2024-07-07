@@ -10,6 +10,7 @@
   --color-red-dark: #e03131;
   --color-yellow: #f4f4f400;
   --color-yellow-dark: rgb(224, 218, 49);
+  --color-green-dark: rgb(43, 192, 75);
 }
 
 * {
@@ -132,6 +133,38 @@ body {
   background-color: var(--color-primary-light);
 }
 
+.edit-text {
+  justify-self: center;
+  border: none;
+  padding: 1.6rem 3.2rem;
+  font-size: 1.6rem;
+  border-radius: 0.8rem;
+  width: 16rem;
+  height: 2rem;
+  transition: all 0.3s;
+  color: var(--color-text);
+
+  background-color: #5050503d;
+}
+
+.edit-text-description {
+  justify-self: center;
+  border: none;
+  padding: 1rem 1rem;
+  font-size: 1.6rem;
+  border-radius: 0.8rem;
+  width: 16rem;
+  height: 25rem;
+  transition: all 0.3s;
+  color: var(--color-text);
+
+  background-color: #5050503d;
+}
+
+.edit-text-description::-webkit-scrollbar {
+  display: none;
+}
+
 .search::placeholder {
   color: var(--color-text-dark);
 }
@@ -228,13 +261,15 @@ body {
   position: absolute;
   right: 2.4rem;
 
-  height: 1.8rem;
-  aspect-ratio: 1;
+  /* Increase the size */
+  height: 2.2rem; /* Adjust this value as needed */
+  width: 2.2rem; /* Ensure width matches height for a perfect circle */
+
   border-radius: 50%;
   border: none;
   background-color: var(--color-red);
   color: var(--color-background-900);
-  font-size: 1.1rem;
+  font-size: 1.5rem; /* Adjust font size to maintain visibility */
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s;
@@ -248,13 +283,15 @@ body {
   position: absolute;
   right: 4.8rem;
 
-  height: 1.8rem;
+  height: 2.2rem; /* Adjust this value as needed */
+  width: 2.2rem; /* Ensure width matches height for a perfect circle */
+
   aspect-ratio: 1;
   border-radius: 50%;
   border: none;
   background-color: var(--color-yellow);
   color: var(--color-background-900);
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s;
@@ -262,6 +299,28 @@ body {
 
 .btn-update:hover {
   background-color: var(--color-yellow-dark);
+}
+
+.btn-save {
+  position: absolute;
+  right: 4.8rem;
+
+  height: 2.2rem; /* Adjust this value as needed */
+  width: 2.2rem; /* Ensure width matches height for a perfect circle */
+
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--color-yellow);
+  color: var(--color-background-900);
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-save:hover {
+  background-color: var(--color-green-dark);
 }
 
 /* ******* */
