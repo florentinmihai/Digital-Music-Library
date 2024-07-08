@@ -61,6 +61,23 @@ http
         res.end();
       }
     } else if (
+      req.method === "DELETE" &&
+      req.url.startsWith("/api/deleteSong/")
+    ) {
+      const [artistName, albumTitle, songTitle] = decodeURI(
+        req.url.split("/api/deleteSong/")[1]
+      ).split("/");
+      try {
+        await database.deleteSong(artistName, albumTitle, songTitle);
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.write(JSON.stringify({ message: "Song deleted successfully" }));
+      } catch (err) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.write(JSON.stringify({ error: "Failed to delete song" }));
+      } finally {
+        res.end();
+      }
+    } else if (
       req.method === "PUT" &&
       req.url.startsWith("/api/updateArtist/")
     ) {

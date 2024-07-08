@@ -74,10 +74,25 @@ async function updateAlbum(artistName, oldTitle, newTitle, newDescription) {
   }
 }
 
+async function deleteSong(artistName, albumTitle, songTitle) {
+  try {
+    await client
+      .db("MusicLibrary")
+      .collection("MusicLibrary")
+      .updateOne(
+        { name: artistName, "albums.title": albumTitle },
+        { $pull: { "albums.$.songs": { title: songTitle } } }
+      );
+  } catch (err) {
+    console.error("Error deleting song:", err);
+  }
+}
+
 module.exports = {
   retrieveMusicLibrary,
   deleteArtist,
   deleteAlbum,
+  deleteSong, // Export the new deleteSong function
   updateArtist,
   updateAlbum,
 };

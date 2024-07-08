@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import ActionButtons from "./ActionButtons";
+import EditButtons from "./EditButtons";
 
 function Artist({
   artist,
@@ -24,25 +26,19 @@ function Artist({
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
           />
-          <button className={"btn-save"} onClick={handleUpdate}>
-            👍🏼
-          </button>
-          <button className={"btn-delete"} onClick={() => setIsEditing(false)}>
-            👎🏼
-          </button>
+
+          <EditButtons
+            onSave={handleUpdate}
+            onCancel={() => setIsEditing(false)}
+          ></EditButtons>
         </>
       ) : (
         <>
           <h3 onClick={() => onSelectArtist(artist)}>{artist.name}</h3>
-          <button
-            className={"btn-delete"}
-            onClick={() => onDeleteArtist(artist.name)}
-          >
-            🗑️
-          </button>
-          <button className={"btn-update"} onClick={() => setIsEditing(true)}>
-            ✏️
-          </button>
+          <ActionButtons
+            onDelete={() => onDeleteArtist(artist.name)}
+            onUpdate={() => setIsEditing(true)}
+          />
         </>
       )}
     </li>

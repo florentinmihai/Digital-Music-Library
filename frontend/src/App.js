@@ -89,6 +89,63 @@ function App() {
     }
   }
 
+  async function handleDeleteSong(artistName, albumTitle, songTitle) {
+    try {
+      // Make the delete request to the server
+      await Axios.delete(
+        `http://localhost:4000/api/deleteSong/${artistName}/${albumTitle}/${songTitle}`
+      );
+
+      // Update the list state
+      setList((prevList) =>
+        prevList.map((artist) =>
+          artist.name === artistName
+            ? {
+                ...artist,
+                albums: artist.albums.map((album) =>
+                  album.title === albumTitle
+                    ? {
+                        ...album,
+                        songs: album.songs.filter(
+                          (song) => song.title !== songTitle
+                        ),
+                      }
+                    : album
+                ),
+              }
+            : artist
+        )
+      );
+
+      // Update the selectedAlbum state if it matches the album being modified
+      setSelectedAlbum((prevSelectedAlbum) =>
+        prevSelectedAlbum && prevSelectedAlbum.title === albumTitle
+          ? {
+              ...prevSelectedAlbum,
+              songs: prevSelectedAlbum.songs.filter(
+                (song) => song.title !== songTitle
+              ),
+            }
+          : prevSelectedAlbum
+      );
+
+      // Update the selectedArtist state to reflect the change in the album's song list
+      setSelectedArtist((prevSelectedArtist) => ({
+        ...prevSelectedArtist,
+        albums: prevSelectedArtist.albums.map((album) =>
+          album.title === albumTitle
+            ? {
+                ...album,
+                songs: album.songs.filter((song) => song.title !== songTitle),
+              }
+            : album
+        ),
+      }));
+    } catch (error) {
+      console.error("Error deleting song:", error);
+    }
+  }
+
   async function handleUpdateArtist(oldName, newName) {
     try {
       await Axios.put(`http://localhost:4000/api/updateArtist/`, {
@@ -202,8 +259,10 @@ function App() {
         <Box title="Details 📃">
           {selectedAlbum ? (
             <AlbumDetails
+              artist={selectedArtist}
               album={selectedAlbum}
               onCloseAlbum={handleCloseAlbum}
+              onDeleteSong={handleDeleteSong}
             />
           ) : (
             <div className="center-text-container">

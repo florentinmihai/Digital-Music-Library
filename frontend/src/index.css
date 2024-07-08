@@ -217,7 +217,7 @@ body {
 .list li {
   position: relative;
   display: grid;
-  grid-template-columns: 15rem 1fr;
+  grid-template-columns: 16rem 1fr;
   grid-template-rows: auto auto;
   column-gap: 2.4rem;
   font-size: 1.6rem;

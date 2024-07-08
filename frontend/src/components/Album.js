@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import ActionButtons from "./ActionButtons";
+import EditButtons from "./EditButtons";
 
 function Album({
   album,
@@ -33,25 +35,19 @@ function Album({
             value={newDescription}
             onChange={(e) => setNewDescription(e.target.value)}
           />
-          <button className={"btn-save"} onClick={handleUpdate}>
-            👍🏼
-          </button>
-          <button className={"btn-delete"} onClick={() => setIsEditing(false)}>
-            👎🏼
-          </button>
+          <EditButtons
+            onSave={handleUpdate}
+            onCancel={() => setIsEditing(false)}
+          ></EditButtons>
         </>
       ) : (
         <>
           <h4 onClick={() => onSelectAlbum(album)}>{album.title}</h4>
-          <button
-            className={"btn-delete"}
-            onClick={() => onDeleteAlbum(artistName, album.title)}
-          >
-            🗑️
-          </button>
-          <button className={"btn-update"} onClick={() => setIsEditing(true)}>
-            ✏️
-          </button>
+
+          <ActionButtons
+            onDelete={() => onDeleteAlbum(artistName, album.title)}
+            onUpdate={() => setIsEditing(true)}
+          />
         </>
       )}
     </li>
