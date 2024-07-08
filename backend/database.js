@@ -134,6 +134,28 @@ async function addArtist(name) {
   }
 }
 
+async function addAlbum(artistName, albumTitle) {
+  try {
+    await client
+      .db("MusicLibrary")
+      .collection("MusicLibrary")
+      .updateOne(
+        { name: artistName },
+        {
+          $push: {
+            albums: {
+              title: albumTitle,
+              description: "",
+              songs: [],
+            },
+          },
+        }
+      );
+  } catch (err) {
+    console.error("Error adding album:", err);
+  }
+}
+
 module.exports = {
   retrieveMusicLibrary,
   deleteArtist,
@@ -143,4 +165,5 @@ module.exports = {
   updateAlbum,
   updateSong,
   addArtist,
+  addAlbum,
 };

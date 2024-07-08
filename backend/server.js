@@ -171,6 +171,24 @@ http
           res.end();
         }
       });
+    } else if (req.method === "POST" && req.url === "/api/addAlbum") {
+      let body = "";
+      req.on("data", (chunk) => {
+        body += chunk.toString();
+      });
+      req.on("end", async () => {
+        const { artistName, albumTitle } = JSON.parse(body);
+        try {
+          await database.addAlbum(artistName, albumTitle);
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.write(JSON.stringify({ message: "Album added successfully" }));
+        } catch (err) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.write(JSON.stringify({ error: "Failed to add album" }));
+        } finally {
+          res.end();
+        }
+      });
     }
   })
   .listen(4000, () => {

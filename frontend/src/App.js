@@ -13,6 +13,7 @@ function App() {
   const [selectedArtist, setSelectedArtist] = useState(null);
   const [selectedAlbum, setSelectedAlbum] = useState(null);
   const [newArtistName, setNewArtistName] = useState("");
+  const [newAlbumName, setNewAlbumName] = useState("");
 
   useEffect(() => {
     Axios.get("http://localhost:4000/api/retrieveMusicLibrary")
@@ -298,6 +299,45 @@ function App() {
     }
   }
 
+  async function handleAddAlbum(event) {
+    event.preventDefault();
+    const currentArtistName = selectedArtist.name;
+    try {
+      await Axios.post(`http://localhost:4000/api/addAlbum`, {
+        artistName: currentArtistName,
+        albumTitle: newAlbumName,
+      });
+
+      const updatedList = list.map((artist) =>
+        artist.name === currentArtistName
+          ? {
+              ...artist,
+              albums: [
+                ...artist.albums,
+                {
+                  title: newAlbumName,
+                  description: "",
+                  songs: [],
+                },
+              ],
+            }
+          : artist
+      );
+
+      setList(updatedList);
+
+      const updatedSelectedArtist = updatedList.find(
+        (artist) => artist.name === currentArtistName
+      );
+
+      setSelectedArtist(updatedSelectedArtist);
+
+      setNewAlbumName("");
+    } catch (error) {
+      console.error("Error adding album:", error);
+    }
+  }
+
   return (
     <>
       <NavBar>
@@ -319,7 +359,12 @@ function App() {
             selectedArtist={selectedArtist}
           />
         </Box>
-        <Box title="Albums 💿">
+        <Box
+          title="Albums 💿"
+          newEntry={newAlbumName}
+          setNewEntry={setNewAlbumName}
+          handleAdd={handleAddAlbum}
+        >
           {selectedArtist ? (
             <AlbumList
               artist={selectedArtist}
