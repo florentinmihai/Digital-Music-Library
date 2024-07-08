@@ -125,6 +125,31 @@ http
           res.end();
         }
       });
+    } else if (req.method === "PUT" && req.url.startsWith("/api/updateSong/")) {
+      let body = "";
+      req.on("data", (chunk) => {
+        body += chunk.toString();
+      });
+      req.on("end", async () => {
+        const { artistName, albumTitle, oldTitle, newTitle, newLength } =
+          JSON.parse(body);
+        try {
+          await database.updateSong(
+            artistName,
+            albumTitle,
+            oldTitle,
+            newTitle,
+            newLength
+          );
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.write(JSON.stringify({ message: "Song updated successfully" }));
+        } catch (err) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.write(JSON.stringify({ error: "Failed to update song" }));
+        } finally {
+          res.end();
+        }
+      });
     }
   })
   .listen(4000);

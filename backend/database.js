@@ -88,6 +88,41 @@ async function deleteSong(artistName, albumTitle, songTitle) {
   }
 }
 
+async function updateSong(
+  artistName,
+  albumTitle,
+  oldTitle,
+  newTitle,
+  newLength
+) {
+  try {
+    await client
+      .db("MusicLibrary")
+      .collection("MusicLibrary")
+      .updateOne(
+        {
+          name: artistName,
+          "albums.title": albumTitle,
+          "albums.songs.title": oldTitle,
+        },
+        {
+          $set: {
+            "albums.$[album].songs.$[song].title": newTitle,
+            "albums.$[album].songs.$[song].length": newLength,
+          },
+        },
+        {
+          arrayFilters: [
+            { "album.title": albumTitle },
+            { "song.title": oldTitle },
+          ],
+        }
+      );
+  } catch (err) {
+    console.error("Error updating song:", err);
+  }
+}
+
 module.exports = {
   retrieveMusicLibrary,
   deleteArtist,
@@ -95,4 +130,5 @@ module.exports = {
   deleteSong, // Export the new deleteSong function
   updateArtist,
   updateAlbum,
+  updateSong,
 };

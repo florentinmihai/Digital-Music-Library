@@ -43,10 +43,6 @@ function App() {
     );
   }
 
-  function handleCloseAlbum() {
-    setSelectedAlbum(null);
-  }
-
   async function handleDeleteArtist(artistName) {
     try {
       await Axios.delete(
@@ -91,12 +87,10 @@ function App() {
 
   async function handleDeleteSong(artistName, albumTitle, songTitle) {
     try {
-      // Make the delete request to the server
       await Axios.delete(
         `http://localhost:4000/api/deleteSong/${artistName}/${albumTitle}/${songTitle}`
       );
 
-      // Update the list state
       setList((prevList) =>
         prevList.map((artist) =>
           artist.name === artistName
@@ -117,7 +111,6 @@ function App() {
         )
       );
 
-      // Update the selectedAlbum state if it matches the album being modified
       setSelectedAlbum((prevSelectedAlbum) =>
         prevSelectedAlbum && prevSelectedAlbum.title === albumTitle
           ? {
@@ -129,7 +122,6 @@ function App() {
           : prevSelectedAlbum
       );
 
-      // Update the selectedArtist state to reflect the change in the album's song list
       setSelectedArtist((prevSelectedArtist) => ({
         ...prevSelectedArtist,
         albums: prevSelectedArtist.albums.map((album) =>
@@ -223,6 +215,75 @@ function App() {
     }
   }
 
+  async function handleUpdateSong(
+    artistName,
+    albumTitle,
+    oldTitle,
+    newTitle,
+    newLength
+  ) {
+    try {
+      await Axios.put(`http://localhost:4000/api/updateSong/`, {
+        artistName,
+        albumTitle,
+        oldTitle,
+        newTitle,
+        newLength,
+      });
+
+      setList((list) =>
+        list.map((artist) =>
+          artist.name === artistName
+            ? {
+                ...artist,
+                albums: artist.albums.map((album) =>
+                  album.title === albumTitle
+                    ? {
+                        ...album,
+                        songs: album.songs.map((song) =>
+                          song.title === oldTitle
+                            ? { ...song, title: newTitle, length: newLength }
+                            : song
+                        ),
+                      }
+                    : album
+                ),
+              }
+            : artist
+        )
+      );
+
+      if (selectedAlbum && selectedAlbum.title === albumTitle) {
+        setSelectedAlbum((prevSelectedAlbum) => ({
+          ...prevSelectedAlbum,
+          songs: prevSelectedAlbum.songs.map((song) =>
+            song.title === oldTitle
+              ? { ...song, title: newTitle, length: newLength }
+              : song
+          ),
+        }));
+      }
+
+      setSelectedArtist((prevSelectedArtist) => ({
+        ...prevSelectedArtist,
+        albums: prevSelectedArtist.albums.map((album) =>
+          album.title === albumTitle
+            ? {
+                ...album,
+                songs: album.songs.map((song) =>
+                  song.title === oldTitle
+                    ? { ...song, title: newTitle, length: newLength }
+                    : song
+                ),
+              }
+            : album
+        ),
+      }));
+    } catch (error) {
+      console.error("Error updating song:", error);
+    }
+  }
+
   return (
     <>
       <NavBar>
@@ -261,12 +322,12 @@ function App() {
             <AlbumDetails
               artist={selectedArtist}
               album={selectedAlbum}
-              onCloseAlbum={handleCloseAlbum}
               onDeleteSong={handleDeleteSong}
+              onUpdateSong={handleUpdateSong} // Pass handleUpdateSong to AlbumDetails
             />
           ) : (
             <div className="center-text-container">
-              <p>Select an album first in order to see the details. 👈🏻⚠️</p>
+              <p>Select an album in order to see the details. 👈🏻⚠️</p>
             </div>
           )}
         </Box>

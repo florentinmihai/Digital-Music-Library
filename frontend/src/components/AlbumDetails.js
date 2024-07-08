@@ -1,7 +1,7 @@
 import React from "react";
 import SongList from "./SongList";
 
-function AlbumDetails({ artist, album, onCloseAlbum, onDeleteSong }) {
+function AlbumDetails({ artist, album, onDeleteSong, onUpdateSong }) {
   return (
     <div className="details">
       <h1 className={"box-title"}>{album.title}</h1>
@@ -16,6 +16,7 @@ function AlbumDetails({ artist, album, onCloseAlbum, onDeleteSong }) {
           album={album.title}
           artist={artist.name}
           onDeleteSong={onDeleteSong}
+          onUpdateSong={onUpdateSong}
         />
       ) : album.description ? (
         <p className="center-text-container">No data available. 🥺</p>
