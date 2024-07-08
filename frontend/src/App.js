@@ -12,6 +12,7 @@ function App() {
   const [list, setList] = useState([]);
   const [selectedArtist, setSelectedArtist] = useState(null);
   const [selectedAlbum, setSelectedAlbum] = useState(null);
+  const [newArtistName, setNewArtistName] = useState("");
 
   useEffect(() => {
     Axios.get("http://localhost:4000/api/retrieveMusicLibrary")
@@ -284,6 +285,19 @@ function App() {
     }
   }
 
+  async function handleAddArtist(event) {
+    event.preventDefault();
+    try {
+      await Axios.post(`http://localhost:4000/api/addArtist`, {
+        name: newArtistName,
+      });
+      setList((prevList) => [...prevList, { name: newArtistName, albums: [] }]);
+      setNewArtistName("");
+    } catch (error) {
+      console.error("Error adding artist:", error);
+    }
+  }
+
   return (
     <>
       <NavBar>
@@ -291,7 +305,12 @@ function App() {
       </NavBar>
 
       <Main>
-        <Box title="Artists 🎤">
+        <Box
+          title="Artists 🎤"
+          newEntry={newArtistName}
+          setNewEntry={setNewArtistName}
+          handleAdd={handleAddArtist}
+        >
           <ArtistList
             list={list}
             onSelectArtist={handleSelectArtist}
@@ -300,7 +319,6 @@ function App() {
             selectedArtist={selectedArtist}
           />
         </Box>
-
         <Box title="Albums 💿">
           {selectedArtist ? (
             <AlbumList
@@ -316,7 +334,6 @@ function App() {
             </div>
           )}
         </Box>
-
         <Box title="Details 📃">
           {selectedAlbum ? (
             <AlbumDetails

@@ -5,7 +5,10 @@ http
   .createServer(async (req, res) => {
     // Handle CORS errors
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET, DELETE, PUT");
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "OPTIONS, GET, DELETE, PUT, POST"
+    );
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     res.setHeader("Access-Control-Max-Age", 2592000); // 30 days
 
@@ -150,6 +153,26 @@ http
           res.end();
         }
       });
+    } else if (req.method === "POST" && req.url === "/api/addArtist") {
+      let body = "";
+      req.on("data", (chunk) => {
+        body += chunk.toString();
+      });
+      req.on("end", async () => {
+        const { name } = JSON.parse(body);
+        try {
+          await database.addArtist(name);
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.write(JSON.stringify({ message: "Artist added successfully" }));
+        } catch (err) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.write(JSON.stringify({ error: "Failed to add artist" }));
+        } finally {
+          res.end();
+        }
+      });
     }
   })
-  .listen(4000);
+  .listen(4000, () => {
+    console.log("Server is listening on port 4000");
+  });

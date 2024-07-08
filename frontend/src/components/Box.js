@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import AddForm from "./AddForm";
 
-function Box({ title, children }) {
+function Box({ title, children, handleAdd, newEntry, setNewEntry }) {
   const [isOpen, setIsOpen] = useState(true);
 
   return (
@@ -9,7 +10,17 @@ function Box({ title, children }) {
         {isOpen ? "-" : "+"}
       </button>
       <h1 className={"box-title"}>{title}</h1>
-      {isOpen && children}
+      {isOpen ? (
+        <AddForm
+          handleAdd={handleAdd}
+          newEntry={newEntry}
+          setNewEntry={setNewEntry}
+          title={title}
+        />
+      ) : (
+        ""
+      )}
+      {children}
     </div>
   );
 }

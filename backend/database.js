@@ -44,6 +44,20 @@ async function deleteAlbum(artistName, albumTitle) {
   }
 }
 
+async function deleteSong(artistName, albumTitle, songTitle) {
+  try {
+    await client
+      .db("MusicLibrary")
+      .collection("MusicLibrary")
+      .updateOne(
+        { name: artistName, "albums.title": albumTitle },
+        { $pull: { "albums.$.songs": { title: songTitle } } }
+      );
+  } catch (err) {
+    console.error("Error deleting song:", err);
+  }
+}
+
 async function updateArtist(oldName, newName) {
   try {
     await client
@@ -71,20 +85,6 @@ async function updateAlbum(artistName, oldTitle, newTitle, newDescription) {
       );
   } catch (err) {
     console.error("Error updating album:", err);
-  }
-}
-
-async function deleteSong(artistName, albumTitle, songTitle) {
-  try {
-    await client
-      .db("MusicLibrary")
-      .collection("MusicLibrary")
-      .updateOne(
-        { name: artistName, "albums.title": albumTitle },
-        { $pull: { "albums.$.songs": { title: songTitle } } }
-      );
-  } catch (err) {
-    console.error("Error deleting song:", err);
   }
 }
 
@@ -123,12 +123,24 @@ async function updateSong(
   }
 }
 
+async function addArtist(name) {
+  try {
+    await client
+      .db("MusicLibrary")
+      .collection("MusicLibrary")
+      .insertOne({ name: name, albums: [] });
+  } catch (err) {
+    console.error("Error adding artist:", err);
+  }
+}
+
 module.exports = {
   retrieveMusicLibrary,
   deleteArtist,
   deleteAlbum,
-  deleteSong, // Export the new deleteSong function
+  deleteSong,
   updateArtist,
   updateAlbum,
   updateSong,
+  addArtist,
 };

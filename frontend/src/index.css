@@ -325,6 +325,28 @@ body {
   transition: all 0.3s;
 }
 
+.btn-add {
+  position: absolute;
+  right: 2.4rem;
+
+  height: 4rem; /* Adjust this value as needed */
+  width: 4rem; /* Ensure width matches height for a perfect circle */
+
+  aspect-ratio: 1;
+  border-radius: 90%;
+  border: none;
+  background-color: var(--color-yellow);
+  color: var(--color-background-900);
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-add:hover {
+  background-color: var(--color-green-dark);
+}
+
 .btn-update:hover {
   background-color: var(--color-yellow-dark);
 }
