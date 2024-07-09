@@ -23,7 +23,11 @@ function AlbumList({
       ))}
     </ul>
   ) : (
-    <div className="center-text-container">No data available. 🥺</div>
+    <div className="details">
+      <p className="box-text-no-data">
+        No albums available.<br></br>Start by adding an album. ✏️💿
+      </p>
+    </div>
   );
 }
 

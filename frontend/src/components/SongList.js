@@ -3,7 +3,7 @@ import Song from "./Song";
 
 function SongList({ artist, album, songs, onDeleteSong, onUpdateSong }) {
   return songs && songs.length > 0 ? (
-    <li className="list list-library">
+    <ul className="list list-library">
       {songs.map((song) => (
         <Song
           song={song}
@@ -14,7 +14,7 @@ function SongList({ artist, album, songs, onDeleteSong, onUpdateSong }) {
           onUpdateSong={onUpdateSong}
         />
       ))}
-    </li>
+    </ul>
   ) : (
     <div className="center-text-container">No data available. 🥺</div>
   );

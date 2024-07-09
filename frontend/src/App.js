@@ -14,6 +14,8 @@ function App() {
   const [selectedAlbum, setSelectedAlbum] = useState(null);
   const [newArtistName, setNewArtistName] = useState("");
   const [newAlbumName, setNewAlbumName] = useState("");
+  const [newSongName, setNewSongName] = useState("");
+  const [newSongLength, setNewSongLength] = useState("");
 
   useEffect(() => {
     Axios.get("http://localhost:4000/api/retrieveMusicLibrary")
@@ -298,10 +300,16 @@ function App() {
       console.error("Error adding artist:", error);
     }
   }
-
   async function handleAddAlbum(event) {
     event.preventDefault();
+
+    if (!selectedArtist) {
+      console.error("No artist selected");
+      return;
+    }
+
     const currentArtistName = selectedArtist.name;
+
     try {
       await Axios.post(`http://localhost:4000/api/addAlbum`, {
         artistName: currentArtistName,
@@ -316,10 +324,72 @@ function App() {
                 ...artist.albums,
                 {
                   title: newAlbumName,
-                  description: "",
                   songs: [],
+                  description: "",
                 },
               ],
+            }
+          : artist
+      );
+
+      setList([...updatedList]);
+
+      const updatedSelectedArtist = updatedList.find(
+        (artist) => artist.name === currentArtistName
+      );
+
+      setSelectedArtist(updatedSelectedArtist);
+
+      setNewAlbumName("");
+    } catch (error) {
+      console.error("Error adding album:", error);
+    }
+  }
+
+  async function handleAddSong(event) {
+    event.preventDefault();
+
+    if (!selectedArtist || !selectedAlbum) {
+      console.error("Selected artist or album is not defined");
+      return;
+    }
+
+    const currentArtistName = selectedArtist.name;
+    const currentAlbumTitle = selectedAlbum.title;
+
+    try {
+      console.log("Sending data to backend:", {
+        artistName: currentArtistName,
+        albumTitle: currentAlbumTitle,
+        songTitle: newSongName,
+        songLength: newSongLength,
+      });
+
+      // Send request to add song to backend
+      const response = await Axios.post(`http://localhost:4000/api/addSong`, {
+        artistName: currentArtistName,
+        albumTitle: currentAlbumTitle,
+        songTitle: newSongName,
+        songLength: newSongLength,
+      });
+
+      console.log("Backend response:", response.data);
+
+      const updatedList = list.map((artist) =>
+        artist.name === currentArtistName
+          ? {
+              ...artist,
+              albums: artist.albums.map((album) =>
+                album.title === currentAlbumTitle
+                  ? {
+                      ...album,
+                      songs: [
+                        ...album.songs,
+                        { title: newSongName, length: newSongLength },
+                      ],
+                    }
+                  : album
+              ),
             }
           : artist
       );
@@ -332,9 +402,16 @@ function App() {
 
       setSelectedArtist(updatedSelectedArtist);
 
-      setNewAlbumName("");
+      const updatedSelectedAlbum = updatedSelectedArtist.albums.find(
+        (album) => album.title === currentAlbumTitle
+      );
+
+      setSelectedAlbum(updatedSelectedAlbum);
+
+      setNewSongName("");
+      setNewSongLength("");
     } catch (error) {
-      console.error("Error adding album:", error);
+      console.error("Error adding song:", error);
     }
   }
 
@@ -374,12 +451,21 @@ function App() {
               selectedAlbum={selectedAlbum}
             />
           ) : (
-            <div className="center-text-container">
-              <p>Select an artist first in order to see the albums. 👈🏻⚠️</p>
+            <div className={"details"}>
+              <p className={"box-text-no-data"}>
+                Select an artist in order to see the albums. ⚠️
+              </p>
             </div>
           )}
         </Box>
-        <Box title="Details 📃">
+        <Box
+          title="Details 📃"
+          newEntry={newSongName}
+          setNewEntry={setNewSongName}
+          handleAdd={handleAddSong}
+          newSongLength={newSongLength}
+          setNewSongLength={setNewSongLength}
+        >
           {selectedAlbum ? (
             <AlbumDetails
               artist={selectedArtist}
@@ -388,8 +474,10 @@ function App() {
               onUpdateSong={handleUpdateSong} // Pass handleUpdateSong to AlbumDetails
             />
           ) : (
-            <div className="center-text-container">
-              <p>Select an album in order to see the details. 👈🏻⚠️</p>
+            <div className={"details"}>
+              <p className={"box-text-no-data"}>
+                Select an album in order to see the details. ⚠️
+              </p>
             </div>
           )}
         </Box>

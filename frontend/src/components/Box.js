@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import AddForm from "./AddForm";
 
-function Box({ title, children, handleAdd, newEntry, setNewEntry }) {
+function Box({
+  title,
+  children,
+  handleAdd,
+  newEntry,
+  setNewEntry,
+  newSongLength,
+  setNewSongLength,
+}) {
   const [isOpen, setIsOpen] = useState(true);
 
   return (
@@ -16,6 +24,8 @@ function Box({ title, children, handleAdd, newEntry, setNewEntry }) {
           newEntry={newEntry}
           setNewEntry={setNewEntry}
           title={title}
+          newSongLength={newSongLength}
+          setNewSongLength={setNewSongLength}
         />
       ) : (
         ""

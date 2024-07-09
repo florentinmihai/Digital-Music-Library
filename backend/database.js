@@ -145,14 +145,37 @@ async function addAlbum(artistName, albumTitle) {
           $push: {
             albums: {
               title: albumTitle,
-              description: "",
-              songs: [],
+              songs: [], // Ensure songs field is empty array initially
+              description: "", // Ensure description field is empty string initially
             },
           },
         }
       );
   } catch (err) {
     console.error("Error adding album:", err);
+    throw err; // Optionally re-throw the error to handle it in the calling function
+  }
+}
+
+async function addSong(artistName, albumTitle, songTitle, songLength) {
+  try {
+    await client
+      .db("MusicLibrary")
+      .collection("MusicLibrary")
+      .updateOne(
+        { name: artistName, "albums.title": albumTitle },
+        {
+          $push: {
+            "albums.$.songs": {
+              title: songTitle,
+              length: songLength,
+            },
+          },
+        }
+      );
+  } catch (err) {
+    console.error("Error adding song:", err);
+    throw err; // Optionally re-throw the error to handle it in the calling function
   }
 }
 
@@ -166,4 +189,5 @@ module.exports = {
   updateSong,
   addArtist,
   addAlbum,
+  addSong,
 };

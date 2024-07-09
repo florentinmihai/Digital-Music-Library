@@ -9,7 +9,12 @@ function ArtistList({
   selectedArtist,
 }) {
   return list.length === 0 ? (
-    <div className="center-text-container">No data available. 🥺</div>
+    <div className={"details"}>
+      <p className={"box-text-no-data"}>
+        No artists available. <br></br>
+        Start by adding an artsit. ✏️💿
+      </p>
+    </div>
   ) : (
     <ul className="list list-library">
       {list.map((artist) => (
