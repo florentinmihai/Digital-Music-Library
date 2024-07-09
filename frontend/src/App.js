@@ -16,6 +16,8 @@ function App() {
   const [newAlbumName, setNewAlbumName] = useState("");
   const [newSongName, setNewSongName] = useState("");
   const [newSongLength, setNewSongLength] = useState("");
+  const [searchFilter, setSearchFilter] = useState("artists");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     Axios.get("http://localhost:4000/api/retrieveMusicLibrary")
@@ -33,6 +35,28 @@ function App() {
         setList([]);
       });
   }, []);
+
+  const handleSearch = (filter, query) => {
+    setSearchFilter(filter);
+    setSearchQuery(query.toLowerCase());
+  };
+
+  const filteredList = list.filter((artist) => {
+    if (searchFilter === "artists") {
+      return artist.name.toLowerCase().includes(searchQuery);
+    } else if (searchFilter === "albums") {
+      return artist.albums.some((album) =>
+        album.title.toLowerCase().includes(searchQuery)
+      );
+    } else if (searchFilter === "songs") {
+      return artist.albums.some((album) =>
+        album.songs.some((song) =>
+          song.title.toLowerCase().includes(searchQuery)
+        )
+      );
+    }
+    return false;
+  });
 
   function handleSelectArtist(artist) {
     setSelectedArtist((selectedArtist) =>
@@ -418,7 +442,7 @@ function App() {
   return (
     <>
       <NavBar>
-        <Search />
+        <Search onSearch={handleSearch} />
       </NavBar>
 
       <Main>
@@ -429,7 +453,7 @@ function App() {
           handleAdd={handleAddArtist}
         >
           <ArtistList
-            list={list}
+            list={searchFilter === "artists" ? filteredList : list}
             onSelectArtist={handleSelectArtist}
             onDeleteArtist={handleDeleteArtist}
             onUpdateArtist={handleUpdateArtist}
@@ -449,6 +473,13 @@ function App() {
               onDeleteAlbum={handleDeleteAlbum}
               onUpdateAlbum={handleUpdateAlbum}
               selectedAlbum={selectedAlbum}
+              filteredAlbums={
+                searchFilter === "albums"
+                  ? selectedArtist.albums.filter((album) =>
+                      album.title.toLowerCase().includes(searchQuery)
+                    )
+                  : selectedArtist.albums
+              }
             />
           ) : (
             <div className={"details"}>
@@ -472,6 +503,13 @@ function App() {
               album={selectedAlbum}
               onDeleteSong={handleDeleteSong}
               onUpdateSong={handleUpdateSong} // Pass handleUpdateSong to AlbumDetails
+              filteredSongs={
+                searchFilter === "songs"
+                  ? selectedAlbum.songs.filter((song) =>
+                      song.title.toLowerCase().includes(searchQuery)
+                    )
+                  : selectedAlbum.songs
+              }
             />
           ) : (
             <div className={"details"}>

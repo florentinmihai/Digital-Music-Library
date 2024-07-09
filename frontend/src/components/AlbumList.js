@@ -7,10 +7,11 @@ function AlbumList({
   onDeleteAlbum,
   onUpdateAlbum,
   selectedAlbum,
+  filteredAlbums,
 }) {
-  return artist.albums && artist.albums.length > 0 ? (
+  return filteredAlbums && filteredAlbums.length > 0 ? (
     <ul className="list list-library">
-      {artist.albums.map((album) => (
+      {filteredAlbums.map((album) => (
         <Album
           album={album}
           key={album.title}

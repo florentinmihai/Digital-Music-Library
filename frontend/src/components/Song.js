@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ActionButtons from "./ActionButtons";
 import EditButtons from "./EditButtons";
 
-function Song({ artist, album, song, length, onDeleteSong, onUpdateSong }) {
+function Song({ artist, album, song, onDeleteSong, onUpdateSong }) {
   const [isEditing, setIsEditing] = useState(false);
   const [newTitle, setNewTitle] = useState(song.title);
   const [newLength, setNewLength] = useState(song.length);
@@ -14,6 +14,28 @@ function Song({ artist, album, song, length, onDeleteSong, onUpdateSong }) {
   const handleSave = () => {
     onUpdateSong(artist, album, song.title, newTitle, newLength);
     setIsEditing(false);
+  };
+
+  const handleLengthChange = (e) => {
+    let value = e.target.value;
+
+    // Remove any non-digit or non-colon characters
+    value = value.replace(/[^\d:]/g, "");
+
+    // Automatically add colon after two digits
+    if (value.length > 2 && value[2] !== ":") {
+      value = value.slice(0, 2) + ":" + value.slice(2);
+    }
+
+    // Limit to AA:BB format and validate BB is not greater than 59
+    const parts = value.split(":");
+    if (parts.length > 1 && parseInt(parts[1], 10) > 59) {
+      return; // Prevent update if BB is greater than 59
+    }
+
+    if (/^\d{0,2}:?\d{0,2}$/.test(value)) {
+      setNewLength(value);
+    }
   };
 
   return isEditing ? (
@@ -29,7 +51,10 @@ function Song({ artist, album, song, length, onDeleteSong, onUpdateSong }) {
         className={"edit-text-song-length"}
         type="text"
         value={newLength}
-        onChange={(e) => setNewLength(e.target.value)}
+        onChange={handleLengthChange}
+        placeholder={"00:00"}
+        pattern="^\d{2}:\d{2}$"
+        required
       />
       <EditButtons
         onCancel={() => setIsEditing(false)}

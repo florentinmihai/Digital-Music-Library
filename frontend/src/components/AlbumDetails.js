@@ -1,7 +1,13 @@
 import React from "react";
 import SongList from "./SongList";
 
-function AlbumDetails({ artist, album, onDeleteSong, onUpdateSong }) {
+function AlbumDetails({
+  artist,
+  album,
+  onDeleteSong,
+  onUpdateSong,
+  filteredSongs,
+}) {
   return (
     <div className="details">
       <h1 className={"box-title"}>{album.title}</h1>
@@ -18,9 +24,9 @@ function AlbumDetails({ artist, album, onDeleteSong, onUpdateSong }) {
           a description by editing the album. ✏️💿
         </p>
       )}
-      {album.songs && album.songs.length > 0 ? (
+      {filteredSongs && filteredSongs.length > 0 ? (
         <SongList
-          songs={album.songs}
+          songs={filteredSongs}
           album={album.title}
           artist={artist.name}
           onDeleteSong={onDeleteSong}
