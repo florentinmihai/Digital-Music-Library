@@ -26,40 +26,42 @@ function AddForm({
   };
 
   return (
-    <form className="list list-library" onSubmit={(e) => handleAdd(e)}>
-      <li>
-        <input
-          className="edit-text-song"
-          type="text"
-          value={newEntry}
-          onChange={(e) => setNewEntry(e.target.value)}
-          placeholder={
-            title === "Details 📃"
-              ? "New song... "
-              : title === "Albums 💿"
-              ? "New album..."
-              : title === "Artists 🎤"
-              ? "New artist..."
-              : ""
-          }
-          required
-        />
-        {title === "Details 📃" && (
+    <div>
+      <form className="list list-library" onSubmit={(e) => handleAdd(e)}>
+        <li>
           <input
-            className="edit-text-song-add-length"
+            className="edit-text-song"
             type="text"
-            value={newSongLength}
-            onChange={handleSongLengthChange}
-            placeholder={"00:00"}
-            pattern="^\d{2}:\d{2}$"
+            value={newEntry}
+            onChange={(e) => setNewEntry(e.target.value)}
+            placeholder={
+              title === "Details 📃"
+                ? "New song... "
+                : title === "Albums 💿"
+                ? "New album..."
+                : title === "Artists 🎤"
+                ? "New artist..."
+                : ""
+            }
             required
           />
-        )}
-        <button className="btn-add" type="submit">
-          Add
-        </button>
-      </li>
-    </form>
+          {title === "Details 📃" && (
+            <input
+              className="edit-text-song-add-length"
+              type="text"
+              value={newSongLength}
+              onChange={handleSongLengthChange}
+              placeholder={"00:00"}
+              pattern="^\d{2}:\d{2}$"
+              required
+            />
+          )}
+          <button className="btn-add" type="submit">
+            Add
+          </button>
+        </li>
+      </form>
+    </div>
   );
 }
 

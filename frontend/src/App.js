@@ -18,6 +18,9 @@ function App() {
   const [newSongLength, setNewSongLength] = useState("");
   const [searchFilter, setSearchFilter] = useState("artists");
   const [searchQuery, setSearchQuery] = useState("");
+  const [allArtists, setAllArtists] = useState([]);
+  const [allAlbums, setAllAlbums] = useState([]);
+  const [allSongs, setAllSongs] = useState([]);
 
   useEffect(() => {
     Axios.get("http://localhost:4000/api/retrieveMusicLibrary")
@@ -25,16 +28,40 @@ function App() {
         const data = res.data;
         if (Array.isArray(data)) {
           setList(data);
+          updateAllStates(data);
         } else {
           console.error("Unexpected data structure:", data);
           setList([]);
+          updateAllStates([]);
         }
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
         setList([]);
+        updateAllStates([]);
       });
   }, []);
+
+  useEffect(() => {
+    updateAllStates(list);
+  }, [list]);
+
+  const updateAllStates = (list) => {
+    const artists = list.map((artist) => artist.name);
+    const albums = list.flatMap((artist) =>
+      artist.albums.map((album) => album.title)
+    );
+    const songs = list.flatMap((artist) =>
+      artist.albums.flatMap((album) => album.songs.map((song) => song.title))
+    );
+
+    setAllArtists(artists);
+    setAllAlbums(albums);
+    setAllSongs(songs);
+  };
+
+  console.log(allAlbums);
+  console.log(allSongs);
 
   const handleSearch = (filter, query) => {
     setSearchFilter(filter);
@@ -442,7 +469,12 @@ function App() {
   return (
     <>
       <NavBar>
-        <Search onSearch={handleSearch} />
+        <Search
+          onSearch={handleSearch}
+          allArtists={allArtists}
+          allAlbums={allAlbums}
+          allSongs={allSongs}
+        />
       </NavBar>
 
       <Main>

@@ -33,33 +33,47 @@ body {
   padding: 2.4rem;
 }
 
-/* ******* */
-
-/* Add these styles to your existing CSS */
-
-/* Add these styles to your existing CSS */
-
 .search-container {
   display: flex;
   align-items: center;
+  position: relative;
+  gap: 10px; /* Add space between the search input and dropdown */
+}
+
+.search-input-wrapper {
+  position: relative;
+  width: 40rem; /* Set a fixed width for the search input wrapper */
 }
 
 .search {
-  padding: 0.8rem 1.6rem;
+  padding: 0.8rem 2rem 0.8rem 1.6rem;
   font-size: 1.8rem;
   border: none;
   border-radius: 0.7rem;
-  width: 40rem;
+  width: 100%;
   transition: all 0.3s;
   color: var(--color-text);
   background-color: var(--color-primary-light);
-  margin-right: 10px; /* Adjust this as needed */
 }
 
 .search:focus {
   outline: none;
   box-shadow: 0 2.4rem 2.4rem rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
+  background-color: #dee2e6;
+  color: #000000d0;
+}
+
+.clear-button {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #25252539;
 }
 
 .dropdown {
@@ -68,14 +82,63 @@ body {
 }
 
 .dropdown-button {
-  padding: 0.6rem 1.5rem;
+  padding: 0.8rem 1.5rem; /* Match the padding of the search input */
   font-size: 1.8rem;
+  height: calc(100% - 1.6rem); /* Adjust height to match the search input */
   border: none;
   border-radius: 0.7rem;
   background-color: var(--color-primary-light);
   color: var(--color-text);
   cursor: pointer;
   transition: all 0.3s;
+}
+
+.suggestions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 20rem; /* Set a max height for the suggestions list */
+  overflow-y: auto; /* Enable vertical scrolling */
+  background-color: #dee2e6;
+  color: #000000d0;
+
+  box-shadow: 0 2.4rem 2.4rem rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+.suggestions-list::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for WebKit browsers (Chrome, Safari) */
+}
+
+.suggestions-list {
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+/* Optional: Customize scrollbar appearance for Firefox */
+.suggestions-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.suggestions-list::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+
+.suggestion-list::-webkit-scrollbar {
+  display: none;
+}
+
+.suggestion-item {
+  padding: 0.8rem 1.6rem;
+  cursor: pointer;
+}
+
+.suggestion-item:hover {
+  background-color: var(--color-primary-dark);
+  color: var(--color-text-light);
 }
 
 .dropdown-button:focus {
@@ -102,11 +165,49 @@ body {
   font-size: 1.8rem;
   cursor: pointer;
   transition: background-color 0.3s;
+  border-radius: 0.7rem;
 }
 
 .dropdown-menu li:hover {
   background-color: var(--color-background-100);
+  border-radius: 0.7rem;
 }
+
+/* Suggestions list styled for responsive design */
+.suggestions-list {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 100%; /* Position it directly below the search input */
+  left: 0;
+  width: 40rem; /* Full width of the container */
+  background-color: #dee2e6;
+  border-radius: 0.7rem;
+  box-shadow: 0 2.4rem 2.4rem rgba(0, 0, 0, 0.03);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  z-index: 1000;
+  max-height: 20rem; /* Limit the height */
+  overflow-y: auto; /* Scroll if too many suggestions */
+  box-sizing: border-box;
+}
+
+/* Suggestion item styling */
+.suggestion-item {
+  padding: 0.8rem 1.6rem;
+  font-size: 1.8rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border-radius: 0.7rem;
+}
+
+.suggestion-item:hover {
+  background-color: #0e0e0e3f;
+  border-radius: 0.7rem;
+}
+
+/* Existing CSS styles */
 
 .center-text-container {
   display: flex;
@@ -207,8 +308,8 @@ body {
   padding: 1.6rem 3.2rem;
   font-size: 1.6rem;
   border-radius: 0.8rem;
-  width: 16rem;
-  height: 2rem;
+  width: 18rem;
+  height: 3rem;
   transition: all 0.3s;
   color: var(--color-text);
 
@@ -221,7 +322,7 @@ body {
   padding: 1.6rem 3.2rem;
   font-size: 1.6rem;
   border-radius: 0.8rem;
-  width: 16rem;
+  width: 18rem;
   height: 2rem;
   transition: all 0.3s;
   color: var(--color-text);
@@ -263,7 +364,7 @@ body {
   padding: 1rem 1rem;
   font-size: 1.6rem;
   border-radius: 0.8rem;
-  width: 16rem;
+  width: 18rem;
   height: 25rem;
   transition: all 0.3s;
   color: var(--color-text);
