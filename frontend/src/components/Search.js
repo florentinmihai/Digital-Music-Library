@@ -102,13 +102,13 @@ function Search({ onSearch, allArtists, allAlbums, allSongs }) {
       >
         <button className="dropdown-button">
           Filter:{" "}
-          {filter === "artists" ? "🎤" : filter === "albums" ? "💿" : "🎵"} ▼
+          {filter === "artists" ? "🎤" : filter === "albums" ? "💿" : "🎧"} ▼
         </button>
         {dropdownOpen && (
           <ul className="dropdown-menu">
             <li onClick={() => handleFilterChange("artists")}>Artists 🎤</li>
             <li onClick={() => handleFilterChange("albums")}>Albums 💿</li>
-            <li onClick={() => handleFilterChange("songs")}>Songs 🎵</li>
+            <li onClick={() => handleFilterChange("songs")}>Songs 🎧</li>
           </ul>
         )}
       </div>

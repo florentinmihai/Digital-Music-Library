@@ -522,7 +522,7 @@ function App() {
           )}
         </Box>
         <Box
-          title="Details 📃"
+          title="Songs 🎧"
           newEntry={newSongName}
           setNewEntry={setNewSongName}
           handleAdd={handleAddSong}
@@ -534,7 +534,7 @@ function App() {
               artist={selectedArtist}
               album={selectedAlbum}
               onDeleteSong={handleDeleteSong}
-              onUpdateSong={handleUpdateSong} // Pass handleUpdateSong to AlbumDetails
+              onUpdateSong={handleUpdateSong}
               filteredSongs={
                 searchFilter === "songs"
                   ? selectedAlbum.songs.filter((song) =>
@@ -546,7 +546,8 @@ function App() {
           ) : (
             <div className={"details"}>
               <p className={"box-text-no-data"}>
-                Select an album in order to see the details. ⚠️
+                Select an album in order to see the description and the songs .
+                ⚠️
               </p>
             </div>
           )}

@@ -35,7 +35,7 @@ function AddForm({
             value={newEntry}
             onChange={(e) => setNewEntry(e.target.value)}
             placeholder={
-              title === "Details 📃"
+              title === "Songs 🎧"
                 ? "New song... "
                 : title === "Albums 💿"
                 ? "New album..."
@@ -45,7 +45,7 @@ function AddForm({
             }
             required
           />
-          {title === "Details 📃" && (
+          {title === "Songs 🎧" && (
             <input
               className="edit-text-song-add-length"
               type="text"

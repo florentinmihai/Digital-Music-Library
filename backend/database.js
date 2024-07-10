@@ -145,15 +145,15 @@ async function addAlbum(artistName, albumTitle) {
           $push: {
             albums: {
               title: albumTitle,
-              songs: [], // Ensure songs field is empty array initially
-              description: "", // Ensure description field is empty string initially
+              songs: [],
+              description: "",
             },
           },
         }
       );
   } catch (err) {
     console.error("Error adding album:", err);
-    throw err; // Optionally re-throw the error to handle it in the calling function
+    throw err;
   }
 }
 
@@ -175,7 +175,7 @@ async function addSong(artistName, albumTitle, songTitle, songLength) {
       );
   } catch (err) {
     console.error("Error adding song:", err);
-    throw err; // Optionally re-throw the error to handle it in the calling function
+    throw err;
   }
 }
 

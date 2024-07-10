@@ -22,17 +22,20 @@ function Song({ artist, album, song, onDeleteSong, onUpdateSong }) {
     // Remove any non-digit or non-colon characters
     value = value.replace(/[^\d:]/g, "");
 
-    // Automatically add colon after two digits
-    if (value.length > 2 && value[2] !== ":") {
+    // Automatically add colon after two digits if there is no colon yet
+    if (value.length > 2 && value.indexOf(":") === -1) {
       value = value.slice(0, 2) + ":" + value.slice(2);
     }
 
-    // Limit to AA:BB format and validate BB is not greater than 59
+    // Ensure the format is AA:BB
     const parts = value.split(":");
-    if (parts.length > 1 && parseInt(parts[1], 10) > 59) {
-      return; // Prevent update if BB is greater than 59
+    if (parts.length > 2) {
+      value = parts[0] + ":" + parts.slice(1).join("").slice(0, 2);
+    } else if (parts.length === 2 && parts[1].length > 2) {
+      value = parts[0] + ":" + parts[1].slice(0, 2);
     }
 
+    // Validate the format
     if (/^\d{0,2}:?\d{0,2}$/.test(value)) {
       setNewLength(value);
     }
